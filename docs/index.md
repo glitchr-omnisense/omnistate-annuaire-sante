@@ -3,7 +3,7 @@
 ## Installation
 
 ```sh
-composer require glitchr/omnistate omnistate/annuaire-sante
+composer require omniscient/omnistate omnistate/annuaire-sante
 ```
 
 In a Symfony application, `Omnistate\Bridge\Symfony\OmnistateBundle` registers it when it is installed:
