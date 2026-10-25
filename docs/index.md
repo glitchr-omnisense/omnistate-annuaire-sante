@@ -180,6 +180,9 @@ With the key, in plain PHP: `new AnnuaireSante(HttpClient::create(), getenv('ESA
 | HTTP 5xx | `Annuaire Santé: the server answered 503.` |
 | another 4xx but 404, no answer, a body that is not JSON | `Annuaire Santé did not answer: ...` |
 
+> [!WARNING]
+> Known defect: a `Retry-After` written as an HTTP date gives `retryAfter` 0 (`AnnuaireSante.php:515`), where it should be the seconds until that date.
+
 HTTP 404 is an empty answer: `null` from a lookup, `[]` from a search.
 
 ## Verified, and not
