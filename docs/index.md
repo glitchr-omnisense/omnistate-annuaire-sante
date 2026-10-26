@@ -1,7 +1,7 @@
 # omnistate/annuaire-sante
 
 French health professionals and facilities for
-[omniscient/omnistate](https://github.com/glitchr-studio/omnistate), from the
+[omnisense/omnistate](https://github.com/glitchr-omnisense/omnistate), from the
 [Annuaire Santé](https://annuaire.sante.fr) of the Agence du numérique en santé (ANS), through its
 [FHIR API](https://ansforge.github.io/annuaire-sante-fhir-documentation/) (version 2): a
 professional by RPPS number - profession, specialties, diplomas, where they practise and how,
@@ -20,10 +20,10 @@ sandbox: the API answers the real register.
 ## Installation
 
 ```sh
-composer require omniscient/omnistate omnistate/annuaire-sante
+composer require omnisense/omnistate omnistate/annuaire-sante
 ```
 
-Requires PHP 8.2, `omniscient/omnistate` (1.x) and `symfony/http-client` (6.4, 7 or 8). In a
+Requires PHP 8.2, `omnisense/omnistate` (1.x) and `symfony/http-client` (6.4, 7 or 8). In a
 Symfony application, `Omnistate\Bridge\Symfony\OmnistateBundle` registers it when it is installed
 (tag `omnistate.professional_registry`):
 

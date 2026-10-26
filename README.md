@@ -3,7 +3,7 @@
 French health professionals and facilities from the [Annuaire Santé](https://annuaire.sante.fr) of the
 Agence du numérique en santé, through its [FHIR API](https://ansforge.github.io/annuaire-sante-fhir-documentation/)
 (version 2): a professional by RPPS number - profession, specialties, diplomas, where they practise and
-how, their MSSanté addresses - and a facility by FINESS number. For [omniscient/omnistate](https://github.com/glitchr-studio/omnistate).
+how, their MSSanté addresses - and a facility by FINESS number. For [omnisense/omnistate](https://github.com/glitchr-omnisense/omnistate).
 
 ```php
 $registry = new AnnuaireSante($httpClient, $_ENV['ESANTE_API_KEY']);
@@ -14,7 +14,7 @@ $registry->search('Martin', postcode: '67');
 $registry->facility('580008803');
 ```
 
-No framework needed: the package requires `omniscient/omnistate` and `symfony/http-client`.
+No framework needed: the package requires `omnisense/omnistate` and `symfony/http-client`.
 `$httpClient` is the HTTP client to call with - the application's, `HttpClient::create()` in
 plain PHP, a `MockHttpClient` in a test.
 
