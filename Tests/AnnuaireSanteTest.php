@@ -120,6 +120,20 @@ final class AnnuaireSanteTest extends TestCase
         }
     }
 
+    /** A Retry-After may be an HTTP date (RFC 9110, 10.2.3): the seconds until then, at least 1. */
+    public function testTooManyCallsWithARetryAfterDate(): void
+    {
+        $registry = new AnnuaireSante(new MockHttpClient(new MockResponse('', ['http_code' => 429, 'response_headers' => ['Retry-After: '.gmdate('D, d M Y H:i:s \\G\\M\\T', time() + 90)]])), 'test-key');
+
+        try {
+            $registry->professional('10003461033');
+            self::fail('no exception');
+        } catch (UnavailableException $e) {
+            self::assertGreaterThanOrEqual(85, $e->retryAfter);
+            self::assertLessThanOrEqual(90, $e->retryAfter);
+        }
+    }
+
     public function testThroughOmnistate(): void
     {
         $omnistate = new Omnistate(professionals: [$this->registry('practitioner-physician.json')]);

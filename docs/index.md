@@ -176,12 +176,9 @@ With the key, in plain PHP: `new AnnuaireSante(HttpClient::create(), getenv('ESA
 |---|---|
 | no key | `Annuaire Santé: no API key (ESANTE-API-KEY, from the ANS Gravitee portal).`, before any request |
 | HTTP 401, 403 | `Annuaire Santé: the key was refused (403).` |
-| HTTP 429 | `Annuaire Santé: too many calls (17 a second).`, `retryAfter` from `Retry-After`, else 1 |
+| HTTP 429 | `Annuaire Santé: too many calls (17 a second).`, `retryAfter` from `Retry-After` (seconds or an HTTP date, at least 1), else 1 |
 | HTTP 5xx | `Annuaire Santé: the server answered 503.` |
 | another 4xx but 404, no answer, a body that is not JSON | `Annuaire Santé did not answer: ...` |
-
-> [!WARNING]
-> Known defect: a `Retry-After` written as an HTTP date gives `retryAfter` 0 (`AnnuaireSante.php:515`), where it should be the seconds until that date.
 
 HTTP 404 is an empty answer: `null` from a lookup, `[]` from a search.
 
@@ -190,15 +187,12 @@ HTTP 404 is an empty answer: `null` from a lookup, `[]` from a search.
 Tested offline: `Tests/AnnuaireSanteTest.php` (a physician by RPPS, the IDNPS form, a
 pharmacist's MSSanté address, another practitioner's answer not taken for theirs, a search
 narrowed to a postcode, a facility by FINESS, nothing asked without a key, a 429 with its
-`Retry-After`, through the facade) and `Tests/AnnuaireSanteContractTest.php`, omnistate's
+`Retry-After` in seconds and as a date, through the facade) and `Tests/AnnuaireSanteContractTest.php`, omnistate's
 conformance suite (professionals and facilities). The tests run on the examples of the ANS's
 implementation guide (fictional people) put in search bundles.
 
 Not verified: the request shape (the `_revinclude` / `_include:iterate` pair) follows the guide;
 it has not been tried against the real API, no key being at hand.
-
-Defect found in the code: `AnnuaireSante.php:515` - a `Retry-After` written as an HTTP date is
-cast to an integer, `0`: `retryAfter` is then 0 instead of the seconds until that date.
 
 ## Responsibility
 

@@ -512,7 +512,7 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
             if (429 === $status) {
                 $retry = $response->getHeaders(false)['retry-after'][0] ?? null;
 
-                throw new UnavailableException('Annuaire Santé: too many calls (17 a second).', null !== $retry ? (int) $retry : 1);
+                throw new UnavailableException('Annuaire Santé: too many calls (17 a second).', self::retryAfter($retry));
             }
             if (401 === $status || 403 === $status) {
                 throw new UnavailableException(sprintf('Annuaire Santé: the key was refused (%d).', $status));
@@ -528,5 +528,17 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
         } catch (ExceptionInterface $e) {
             throw new UnavailableException('Annuaire Santé did not answer: '.$e->getMessage(), null, $e);
         }
+    }
+
+    /** Retry-After in seconds or as an HTTP date (RFC 9110, 10.2.3), at least 1; 1 s when there is none to read. */
+    private static function retryAfter(?string $header): int
+    {
+        $header = trim((string) $header);
+        if (is_numeric($header)) {
+            return max(1, (int) $header);
+        }
+        $date = '' === $header ? false : strtotime($header);
+
+        return false === $date ? 1 : max(1, $date - time());
     }
 }
