@@ -3,6 +3,7 @@
 namespace Omnistate\AnnuaireSante;
 
 use Omnistate\Exception\UnavailableException;
+use Omnistate\Http\Redaction;
 use Omnistate\Identifier\Finess;
 use Omnistate\Identifier\Rpps;
 use Omnistate\Model\Address;
@@ -526,7 +527,10 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
 
             return $response->toArray();
         } catch (ExceptionInterface $e) {
-            throw new UnavailableException('Annuaire Santé did not answer: '.$e->getMessage(), null, $e);
+            // The key, in the request's headers, kept out: the previous a copy of the client's exception, no trace keeping the options.
+            $secrets = array_values(array_filter([(string) $this->apiKey]));
+
+            throw Redaction::withoutArguments(new UnavailableException('Annuaire Santé did not answer: '.Redaction::text($e->getMessage(), $secrets), null, Redaction::copy($e, $secrets)));
         }
     }
 
