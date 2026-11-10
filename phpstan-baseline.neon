@@ -1,0 +1,565 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 17
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Binary operation "\." between ''Organization/'' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Binary operation "\." between ''Practitioner/'' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''code'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 12
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''coding'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 9
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''display'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''end'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''extension'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''family'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''given'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''lastUpdated'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''prefix'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''reference'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''resource'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''resourceType'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''system'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 8
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''type'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''url'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''use'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''value'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 5
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''valueCoding'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''valueString'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset 0 on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 11
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 12
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Generator expects value type array, mixed given\.$#'
+			identifier: generator.valueType
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:address\(\) has parameter \$address with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:facilityOf\(\) has parameter \$organization with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:finess\(\) has parameter \$organization with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:get\(\) has parameter \$query with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:get\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:profession\(\) has parameter \$coding with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:professionalOf\(\) has parameter \$organizations with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:professionalOf\(\) has parameter \$practitioner with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:professionals\(\) has parameter \$bundle with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:qualification\(\) has parameter \$coding with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:resources\(\) has parameter \$bundle with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:resources\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:telecom\(\) has parameter \$telecom with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:usualName\(\) has parameter \$names with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:usualName\(\) should return array\{family\: string, given\: string\|null, prefix\: string\|null\} but returns array\{family\: string, given\: string\|null, prefix\: mixed\}\.$#'
+			identifier: return.type
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:workplace\(\) has parameter \$organization with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:workplace\(\) has parameter \$role with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Only iterables can be unpacked, mixed given\.$#'
+			identifier: arrayUnpacking.nonIterable
+			count: 2
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#1 \$address of method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:address\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#1 \$array \(array\{0\?\: non\-falsy\-string\}\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#1 \$coding of method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:profession\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#1 \$coding of method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:qualification\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 4
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#1 \$date of method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:date\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#1 \$finess of static method Omnistate\\Identifier\\Finess\:\:normalize\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#1 \$names of method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:usualName\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#1 \$rpps of static method Omnistate\\Identifier\\Rpps\:\:normalize\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#1 \$string of function strtolower expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#1 \$system of method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:system\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 4
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#1 \$telecom of method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:telecom\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 3
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#2 \$array of function implode expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#2 \$array of function implode expects array\<string\>, array\<int\<0, max\>, mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#2 \$code of method Omnistate\\AnnuaireSante\\AnnuaireSante\:\:has\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \#3 \$label of class Omnistate\\Model\\Qualification constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \$facility of class Omnistate\\Model\\Workplace constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \$mode of class Omnistate\\Model\\Workplace constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \$name of class Omnistate\\Model\\Workplace constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \$postalCode of class Omnistate\\Model\\Address constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Parameter \$role of class Omnistate\\Model\\Workplace constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 3
+			path: AnnuaireSante.php
+
+		-
+			message: '#^Cannot access offset ''headers'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$address on Omnistate\\Model\\Facility\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$city on Omnistate\\Model\\Address\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$code on Omnistate\\Model\\Qualification\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$diplomas on Omnistate\\Model\\Professional\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$emails on Omnistate\\Model\\Professional\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$identifier on Omnistate\\Model\\Facility\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$identifier on Omnistate\\Model\\Professional\|null\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$kind on Omnistate\\Model\\Facility\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$languages on Omnistate\\Model\\Professional\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$name on Omnistate\\Model\\Facility\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$phones on Omnistate\\Model\\Facility\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$phones on Omnistate\\Model\\Professional\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$postalCode on Omnistate\\Model\\Address\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$prefix on Omnistate\\Model\\Professional\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$profession on Omnistate\\Model\\Professional\|null\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$secureEmails on Omnistate\\Model\\Professional\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$source on Omnistate\\Model\\Professional\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$street on Omnistate\\Model\\Address\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$types on Omnistate\\Model\\Facility\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot access property \$workplaces on Omnistate\\Model\\Professional\|null\.$#'
+			identifier: property.nonObject
+			count: 6
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot call method name\(\) on Omnistate\\Model\\Professional\|null\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Cannot use array destructuring on mixed\.$#'
+			identifier: offsetAccess.nonArray
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\Tests\\AnnuaireSanteTest\:\:registry\(\) has parameter \$requests with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Method Omnistate\\AnnuaireSante\\Tests\\AnnuaireSanteTest\:\:registry\(\) never assigns null to &\$requests so it can be removed from the by\-ref type\.$#'
+			identifier: parameterByRef.unusedType
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Offset 0 might not exist on array\|null\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Parameter \#1 \$body of class Symfony\\Component\\HttpClient\\Response\\MockResponse constructor expects iterable\<string\|Throwable\>\|string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Parameter \#2 \$haystack of static method PHPUnit\\Framework\\Assert\:\:assertContains\(\) expects iterable, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Parameter \#2 \$haystack of static method PHPUnit\\Framework\\Assert\:\:assertStringContainsString\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: Tests/AnnuaireSanteTest.php
+
+		-
+			message: '#^Parameter \#2 \$string of static method PHPUnit\\Framework\\Assert\:\:assertStringStartsWith\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: Tests/AnnuaireSanteTest.php

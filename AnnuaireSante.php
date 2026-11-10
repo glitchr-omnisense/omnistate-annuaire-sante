@@ -2,6 +2,8 @@
 
 namespace Omnistate\AnnuaireSante;
 
+use Omnisense\Contracts\Policy\DeclaresUsagePolicyInterface;
+use Omnisense\Contracts\Policy\UsagePolicy;
 use Omnistate\Exception\UnavailableException;
 use Omnistate\Http\Redaction;
 use Omnistate\Identifier\Finess;
@@ -27,7 +29,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * Without a key every call throws UnavailableException: not knowing is not
  * "no such professional".
  */
-final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegistryInterface
+final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegistryInterface, DeclaresUsagePolicyInterface
 {
     public const URL = 'https://gateway.api.esante.gouv.fr/fhir/v2';
 
@@ -74,6 +76,12 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
         private readonly float $timeout = 10,
         private readonly string $url = self::URL,
     ) {
+    }
+
+    /** Its usage policy: policy.json, beside this class. */
+    public function usagePolicy(): UsagePolicy
+    {
+        return UsagePolicy::fromFile(__DIR__.'/policy.json');
     }
 
     public function name(): string
@@ -513,7 +521,7 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
             if (429 === $status) {
                 $retry = $response->getHeaders(false)['retry-after'][0] ?? null;
 
-                throw new UnavailableException('Annuaire Santé: too many calls (17 a second).', self::retryAfter($retry));
+                throw new UnavailableException('Annuaire Santé: too many calls (17 a second).', self::retryAfter($retry), null, 429);
             }
             if (401 === $status || 403 === $status) {
                 throw new UnavailableException(sprintf('Annuaire Santé: the key was refused (%d).', $status));

@@ -194,6 +194,14 @@ implementation guide (fictional people) put in search bundles.
 Not verified: the request shape (the `_revinclude` / `_include:iterate` pair) follows the guide;
 it has not been tried against the real API, no key being at hand.
 
+## Usage policy
+
+`policy.json` (omnisense/contracts' schema), given by `usagePolicy()`: limits 17 a second per key.
+The figures are this manual's, read on 2026-10-25; the service's terms were not read again when the
+policy was written (`verifiedAt: null`), so what they say of commercial use, caching and storage is
+`unknown`. Through `Omnistate\Omnistate`, a call over a limit is never made and a 429 holds the next
+calls for its `retryAfter` (core: docs/policies.md); a site adds its own limits with `policies:`.
+
 ## Responsibility
 
 An independent, unofficial client, not affiliated with the ANS (Agence du Numérique en Santé).

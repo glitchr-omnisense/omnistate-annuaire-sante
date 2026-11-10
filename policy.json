@@ -1,0 +1,45 @@
+{
+    "$schema": "https://github.com/glitchr-omnisense/contracts/blob/1.x/resources/usage-policy.schema.json",
+    "provider": "annuaire-sante",
+    "rateLimits": [
+        {
+            "max": 17,
+            "window": "second",
+            "scope": "key",
+            "operations": [],
+            "note": "17 calls a second per key, as the API's README gives it (docs/index.md)."
+        }
+    ],
+    "rights": {
+        "commercial": "unknown",
+        "openSourceRequired": null,
+        "caching": {
+            "permission": "unknown",
+            "maxTtl": null
+        },
+        "storage": "unknown",
+        "redistribution": "unknown",
+        "attribution": {
+            "required": false,
+            "text": null,
+            "url": null,
+            "where": []
+        },
+        "licence": null
+    },
+    "requirements": {
+        "key": true,
+        "userAgent": {
+            "required": false,
+            "pattern": null
+        }
+    },
+    "provenance": {
+        "terms": "https://esante.gouv.fr/offres-services/annuaire-sante/acceder-aux-donnees",
+        "policy": "https://portail.openfhir.annuaire.sante.fr/",
+        "verifiedAt": null,
+        "declaredBy": "maintainer",
+        "contact": null,
+        "notes": "Figures from this package's docs/index.md (its live run of 2026-10-25); the terms were not re-read when the policy was first written (2026-11-10): rights the terms were not read for are unknown."
+    }
+}
