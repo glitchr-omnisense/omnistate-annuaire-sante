@@ -174,7 +174,7 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
         }
         $roles = [];
         foreach ($this->resources($bundle, 'PractitionerRole') as $role) {
-            $roles[$role['practitioner']['reference'] ?? ''][] = $role;
+            $roles[self::string($role['practitioner']['reference'] ?? null) ?? ''][] = $role;
         }
 
         $professionals = [];
@@ -198,24 +198,24 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
         foreach ($practitioner['identifier'] ?? [] as $identifier) {
             $type = $identifier['type']['coding'][0]['code'] ?? null;
             if ('RPPS' === $type || 'https://rpps.esante.gouv.fr' === ($identifier['system'] ?? null)) {
-                $rpps = Rpps::normalize($identifier['value'] ?? null);
+                $rpps = Rpps::normalize(self::string($identifier['value'] ?? null));
                 break;
             }
             if ('IDNPS' === $type) {
-                $rpps ??= Rpps::normalize($identifier['value'] ?? null);
+                $rpps ??= Rpps::normalize(self::string($identifier['value'] ?? null));
             }
         }
         if (null === $rpps) {
             return null;
         }
 
-        $name = $this->usualName($practitioner['name'] ?? []);
+        $name = $this->usualName(self::object($practitioner['name'] ?? null));
         $profession = null;
         $specialties = [];
         $diplomas = [];
         foreach ($practitioner['qualification'] ?? [] as $qualification) {
             foreach ($qualification['code']['coding'] ?? [] as $coding) {
-                $system = $this->system($coding['system'] ?? '');
+                $system = $this->system(self::string($coding['system'] ?? null) ?? '');
                 if (self::PROFESSION === $system) {
                     $profession ??= $this->profession($coding);
                 } elseif (self::CATEGORY === $system) {
@@ -235,32 +235,32 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
         foreach ($roles as $role) {
             foreach ($role['code'] ?? [] as $code) {
                 foreach ($code['coding'] ?? [] as $coding) {
-                    if (null === $profession && self::PROFESSION === $this->system($coding['system'] ?? '')) {
+                    if (null === $profession && self::PROFESSION === $this->system(self::string($coding['system'] ?? null) ?? '')) {
                         $profession = $this->profession($coding);
                     }
                 }
             }
             foreach ($role['specialty'] ?? [] as $specialty) {
                 foreach ($specialty['coding'] ?? [] as $coding) {
-                    if (isset($coding['code']) && !$this->has($specialties, $coding['code'])) {
+                    if (isset($coding['code']) && !$this->has($specialties, (string) self::string($coding['code']))) {
                         $specialties[] = $this->qualification($coding);
                     }
                 }
             }
-            $workplaces[] = $this->workplace($role, $organizations[$role['organization']['reference'] ?? ''] ?? null);
+            $workplaces[] = $this->workplace($role, $organizations[self::string($role['organization']['reference'] ?? null) ?? ''] ?? null);
         }
         usort($workplaces, static fn (Workplace $a, Workplace $b) => $b->active <=> $a->active);
 
-        [$phones, $emails, $secure] = $this->telecom($practitioner['telecom'] ?? []);
+        [$phones, $emails, $secure] = $this->telecom(self::object($practitioner['telecom'] ?? null));
         foreach ($roles as $role) {
-            [, , $roleSecure] = $this->telecom($role['telecom'] ?? []);
+            [, , $roleSecure] = $this->telecom(self::object($role['telecom'] ?? null));
             $secure = array_values(array_unique([...$secure, ...$roleSecure]));
         }
 
         $languages = [];
         foreach ($practitioner['communication'] ?? [] as $communication) {
             if (isset($communication['coding'][0]['code'])) {
-                $languages[] = strtolower($communication['coding'][0]['code']);
+                $languages[] = strtolower((string) self::string($communication['coding'][0]['code']));
             }
         }
 
@@ -279,7 +279,7 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
             secureEmails: $secure,
             languages: $languages,
             active: (bool) ($practitioner['active'] ?? true),
-            updatedAt: $this->date($practitioner['meta']['lastUpdated'] ?? null),
+            updatedAt: $this->date(self::string($practitioner['meta']['lastUpdated'] ?? null)),
             raw: $practitioner,
         );
     }
@@ -290,20 +290,21 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
         $function = null;
         foreach ($role['code'] ?? [] as $code) {
             foreach ($code['coding'] ?? [] as $coding) {
-                $system = $this->system($coding['system'] ?? '');
+                $system = $this->system(self::string($coding['system'] ?? null) ?? '');
                 if (self::MODE === $system) {
-                    $mode = self::MODES[$coding['code'] ?? ''] ?? ($coding['code'] ?? null);
+                    $code = self::string($coding['code'] ?? null);
+                    $mode = self::MODES[$code ?? ''] ?? $code;
                 } elseif (self::ROLE === $system) {
-                    $function = $coding['display'] ?? $coding['code'] ?? null;
+                    $function = self::string($coding['display'] ?? $coding['code'] ?? null);
                 }
             }
         }
-        [$phones, , $secure] = $this->telecom([...($organization['telecom'] ?? []), ...($role['telecom'] ?? [])]);
+        [$phones, , $secure] = $this->telecom([...self::object($organization['telecom'] ?? null), ...self::object($role['telecom'] ?? null)]);
 
         return new Workplace(
-            name: $organization['name'] ?? null,
-            address: isset($organization['address'][0]) ? $this->address($organization['address'][0]) : null,
-            facility: null !== $organization ? $this->finess($organization) ?? ($organization['id'] ?? null) : null,
+            name: self::string($organization['name'] ?? null),
+            address: isset($organization['address'][0]) ? $this->address(self::object($organization['address'][0])) : null,
+            facility: null !== $organization ? $this->finess($organization) ?? self::string($organization['id'] ?? null) : null,
             mode: $mode,
             role: $function,
             phones: $phones,
@@ -335,7 +336,7 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
                 }
             }
         }
-        [$phones, $emails, $secure] = $this->telecom($organization['telecom'] ?? []);
+        [$phones, $emails, $secure] = $this->telecom(self::object($organization['telecom'] ?? null));
 
         return new Facility(
             identifier: $this->finess($organization) ?? (string) ($organization['id'] ?? ''),
@@ -343,13 +344,13 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
             source: $this->name(),
             kind: $kind,
             types: $types,
-            address: isset($organization['address'][0]) ? $this->address($organization['address'][0]) : null,
+            address: isset($organization['address'][0]) ? $this->address(self::object($organization['address'][0])) : null,
             phones: $phones,
             emails: $emails,
             secureEmails: $secure,
             identifiers: $identifiers,
             active: (bool) ($organization['active'] ?? true),
-            updatedAt: $this->date($organization['meta']['lastUpdated'] ?? null),
+            updatedAt: $this->date(self::string($organization['meta']['lastUpdated'] ?? null)),
             raw: $organization,
         );
     }
@@ -358,7 +359,7 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
     {
         foreach ($organization['identifier'] ?? [] as $identifier) {
             if ('https://finess.esante.gouv.fr' === ($identifier['system'] ?? null) || \in_array($identifier['type']['coding'][0]['code'] ?? null, ['FINEG', 'FINEJ'], true)) {
-                return Finess::normalize($identifier['value'] ?? null);
+                return Finess::normalize(self::string($identifier['value'] ?? null));
             }
         }
 
@@ -378,8 +379,8 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
 
         return [
             'family' => (string) ($chosen['family'] ?? ''),
-            'given' => isset($chosen['given']) ? implode(' ', $chosen['given']) : null,
-            'prefix' => $chosen['prefix'][0] ?? null,
+            'given' => isset($chosen['given']) ? implode(' ', self::object($chosen['given'])) : null,
+            'prefix' => self::string($chosen['prefix'][0] ?? null),
         ];
     }
 
@@ -427,7 +428,7 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
             }
             $street = trim(implode(' ', array_filter($parts))) ?: (isset($address['line'][0]) ? (string) $address['line'][0] : null);
         }
-        $postalCode = $address['postalCode'] ?? null;
+        $postalCode = self::string($address['postalCode'] ?? null);
         $city = isset($address['city']) ? trim((string) preg_replace('/^\d{5}\s+/', '', (string) $address['city'])) : null;
 
         return new Address(
@@ -443,12 +444,12 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
     {
         $code = (string) ($coding['code'] ?? '');
 
-        return new Qualification($code, self::PROFESSION, $coding['display'] ?? self::PROFESSIONS[$code] ?? null);
+        return new Qualification($code, self::PROFESSION, self::string($coding['display'] ?? null) ?? self::PROFESSIONS[$code] ?? null);
     }
 
     private function qualification(array $coding): Qualification
     {
-        return new Qualification((string) $coding['code'], $this->system($coding['system'] ?? ''), $coding['display'] ?? null);
+        return new Qualification((string) $coding['code'], $this->system(self::string($coding['system'] ?? null) ?? ''), self::string($coding['display'] ?? null));
     }
 
     /** ".../NOS/TRE_G15-ProfessionSante/FHIR/TRE-G15-ProfessionSante" -> "TRE_G15-ProfessionSante" */
@@ -540,6 +541,46 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
 
             throw Redaction::withoutArguments(new UnavailableException('Annuaire Santé did not answer: '.Redaction::text($e->getMessage(), $secrets), null, Redaction::copy($e, $secrets)));
         }
+    }
+
+    /**
+     * A FHIR string, as PHP handed it to a string parameter: null, a string, a
+     * number or a boolean written as one; an object or a list where a string
+     * belongs is an answer of another shape.
+     *
+     * @throws UnavailableException
+     */
+    private static function string(mixed $value): ?string
+    {
+        return match (true) {
+            null === $value, \is_string($value) => $value,
+            \is_int($value), \is_float($value) => (string) $value,
+            \is_bool($value) => $value ? '1' : '',
+            default => throw self::malformed(),
+        };
+    }
+
+    /**
+     * A FHIR object or list, as PHP handed it to an array parameter: [] when
+     * absent; anything else where one belongs is an answer of another shape.
+     *
+     * @return array<mixed>
+     *
+     * @throws UnavailableException
+     */
+    private static function object(mixed $value): array
+    {
+        return match (true) {
+            null === $value => [],
+            \is_array($value) => $value,
+            default => throw self::malformed(),
+        };
+    }
+
+    /** The family's rule on a body that is not what it should be (docs/providers.md). */
+    private static function malformed(): UnavailableException
+    {
+        return new UnavailableException('Annuaire Santé answered a resource of another shape than FHIR\'s.');
     }
 
     /** Retry-After in seconds or as an HTTP date (RFC 9110, 10.2.3), at least 1; 1 s when there is none to read. */

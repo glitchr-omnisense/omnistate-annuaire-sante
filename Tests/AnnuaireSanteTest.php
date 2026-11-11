@@ -142,6 +142,27 @@ final class AnnuaireSanteTest extends TestCase
         self::assertTrue($this->registry('organization.json')->supportsFacility('2A0001234'), 'Corsica');
     }
 
+    /** A resource whose fields are not of FHIR's shapes is the register's fault: unavailable, as the family's rule has it. */
+    public function testAResourceOfAnotherShapeIsUnavailable(): void
+    {
+        $physician = json_decode((string) file_get_contents(__DIR__.'/Fixtures/practitioner-physician.json'), true);
+        self::assertIsArray($physician);
+        $shapes = [
+            'a name that is not a list' => static function (array $bundle): array { $bundle['entry'][0]['resource']['name'] = 'Saucier'; return $bundle; },
+            'a telecom that is not a list' => static function (array $bundle): array { $bundle['entry'][0]['resource']['telecom'] = '0603590791'; return $bundle; },
+            'an identifier value that is an object' => static function (array $bundle): array { $bundle['entry'][0]['resource']['identifier'][0]['value'] = ['10003461033']; return $bundle; },
+        ];
+        foreach ($shapes as $shape => $change) {
+            $registry = new AnnuaireSante(new MockHttpClient(new MockResponse(json_encode($change($physician), \JSON_THROW_ON_ERROR))), 'test-key');
+            try {
+                $registry->professional('10003461033');
+                self::fail($shape.': answered');
+            } catch (UnavailableException $e) {
+                self::assertStringContainsString('another shape', $e->getMessage(), $shape);
+            }
+        }
+    }
+
     private function registry(string $fixture, ?array &$requests = null): AnnuaireSante
     {
         $requests = [];

@@ -11,6 +11,9 @@
 - PHPStan at level max, its baseline what the package had on 2026-11-10.
 
 ### Fixed
+- A resource whose fields are not of FHIR's shapes (a list or an object where a string belongs, a
+  string where a list or an object belongs, where PHP threw a `TypeError` or an `Error`) is an
+  `UnavailableException`, the family's rule on a body that is not what it should be.
 - An unreachable Annuaire Santé no longer carries the key: the `UnavailableException` wrapped the HTTP
   client's own exception, whose trace kept the request's headers in its arguments
   (`zend.exception_ignore_args` off). The previous is now a copy of it (the same class and code, the
