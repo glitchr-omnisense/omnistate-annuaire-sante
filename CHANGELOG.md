@@ -10,6 +10,10 @@
 - A 429 is thrown with `$status` 429: through the facade, the next calls wait for its `retryAfter`.
 - PHPStan at level max, its baseline what the package had on 2026-11-10.
 
+### Changed
+- PHPStan at level max with an empty baseline, types only: `professionals()` takes the decoded
+  Bundle as `array<mixed>`.
+
 ### Fixed
 - A resource whose fields are not of FHIR's shapes (a list or an object where a string belongs, a
   string where a list or an object belongs, where PHP threw a `TypeError` or an `Error`) is an

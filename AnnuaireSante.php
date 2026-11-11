@@ -164,22 +164,24 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
      * The professionals of a search answer, each with the roles and the
      * organizations it included.
      *
+     * @param array<mixed> $bundle
+     *
      * @return list<Professional>
      */
     public function professionals(array $bundle): array
     {
         $organizations = [];
         foreach ($this->resources($bundle, 'Organization') as $organization) {
-            $organizations['Organization/'.($organization['id'] ?? '')] = $organization;
+            $organizations['Organization/'.self::cast($organization['id'] ?? '')] = $organization;
         }
         $roles = [];
         foreach ($this->resources($bundle, 'PractitionerRole') as $role) {
-            $roles[self::string($role['practitioner']['reference'] ?? null) ?? ''][] = $role;
+            $roles[self::string(self::at($role, 'practitioner', 'reference')) ?? ''][] = $role;
         }
 
         $professionals = [];
         foreach ($this->resources($bundle, 'Practitioner') as $practitioner) {
-            $professional = $this->professionalOf($practitioner, $roles['Practitioner/'.($practitioner['id'] ?? '')] ?? [], $organizations);
+            $professional = $this->professionalOf($practitioner, $roles['Practitioner/'.self::cast($practitioner['id'] ?? '')] ?? [], $organizations);
             if (null !== $professional) {
                 $professionals[] = $professional;
             }
@@ -189,20 +191,21 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
     }
 
     /**
-     * @param list<array> $roles
-     * @param array<string, array> $organizations
+     * @param array<mixed>                $practitioner
+     * @param list<array<mixed>>          $roles
+     * @param array<string, array<mixed>> $organizations
      */
     private function professionalOf(array $practitioner, array $roles, array $organizations): ?Professional
     {
         $rpps = null;
-        foreach ($practitioner['identifier'] ?? [] as $identifier) {
-            $type = $identifier['type']['coding'][0]['code'] ?? null;
-            if ('RPPS' === $type || 'https://rpps.esante.gouv.fr' === ($identifier['system'] ?? null)) {
-                $rpps = Rpps::normalize(self::string($identifier['value'] ?? null));
+        foreach (self::items($practitioner['identifier'] ?? null) as $identifier) {
+            $type = self::at($identifier, 'type', 'coding', 0, 'code');
+            if ('RPPS' === $type || 'https://rpps.esante.gouv.fr' === self::at($identifier, 'system')) {
+                $rpps = Rpps::normalize(self::string(self::at($identifier, 'value')));
                 break;
             }
             if ('IDNPS' === $type) {
-                $rpps ??= Rpps::normalize(self::string($identifier['value'] ?? null));
+                $rpps ??= Rpps::normalize(self::string(self::at($identifier, 'value')));
             }
         }
         if (null === $rpps) {
@@ -213,8 +216,9 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
         $profession = null;
         $specialties = [];
         $diplomas = [];
-        foreach ($practitioner['qualification'] ?? [] as $qualification) {
-            foreach ($qualification['code']['coding'] ?? [] as $coding) {
+        foreach (self::items($practitioner['qualification'] ?? null) as $qualification) {
+            foreach (self::items(self::at($qualification, 'code', 'coding')) as $coding) {
+                $coding = self::items($coding);
                 $system = $this->system(self::string($coding['system'] ?? null) ?? '');
                 if (self::PROFESSION === $system) {
                     $profession ??= $this->profession($coding);
@@ -233,21 +237,24 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
 
         $workplaces = [];
         foreach ($roles as $role) {
-            foreach ($role['code'] ?? [] as $code) {
-                foreach ($code['coding'] ?? [] as $coding) {
+            foreach (self::items($role['code'] ?? null) as $code) {
+                foreach (self::items(self::at($code, 'coding')) as $coding) {
+                    $coding = self::items($coding);
                     if (null === $profession && self::PROFESSION === $this->system(self::string($coding['system'] ?? null) ?? '')) {
                         $profession = $this->profession($coding);
                     }
                 }
             }
-            foreach ($role['specialty'] ?? [] as $specialty) {
-                foreach ($specialty['coding'] ?? [] as $coding) {
-                    if (isset($coding['code']) && !$this->has($specialties, (string) self::string($coding['code']))) {
+            foreach (self::items($role['specialty'] ?? null) as $specialty) {
+                foreach (self::items(self::at($specialty, 'coding')) as $coding) {
+                    $coding = self::items($coding);
+                    $specialty = self::string($coding['code'] ?? null);
+                    if (null !== $specialty && !$this->has($specialties, $specialty)) {
                         $specialties[] = $this->qualification($coding);
                     }
                 }
             }
-            $workplaces[] = $this->workplace($role, $organizations[self::string($role['organization']['reference'] ?? null) ?? ''] ?? null);
+            $workplaces[] = $this->workplace($role, $organizations[self::string(self::at($role, 'organization', 'reference')) ?? ''] ?? null);
         }
         usort($workplaces, static fn (Workplace $a, Workplace $b) => $b->active <=> $a->active);
 
@@ -258,9 +265,10 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
         }
 
         $languages = [];
-        foreach ($practitioner['communication'] ?? [] as $communication) {
-            if (isset($communication['coding'][0]['code'])) {
-                $languages[] = strtolower((string) self::string($communication['coding'][0]['code']));
+        foreach (self::items($practitioner['communication'] ?? null) as $communication) {
+            $language = self::string(self::at($communication, 'coding', 0, 'code'));
+            if (null !== $language) {
+                $languages[] = strtolower($language);
             }
         }
 
@@ -279,126 +287,147 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
             secureEmails: $secure,
             languages: $languages,
             active: (bool) ($practitioner['active'] ?? true),
-            updatedAt: $this->date(self::string($practitioner['meta']['lastUpdated'] ?? null)),
+            updatedAt: $this->date(self::string(self::at($practitioner, 'meta', 'lastUpdated'))),
             raw: $practitioner,
         );
     }
 
+    /**
+     * @param array<mixed>      $role
+     * @param array<mixed>|null $organization
+     */
     private function workplace(array $role, ?array $organization): Workplace
     {
         $mode = null;
         $function = null;
-        foreach ($role['code'] ?? [] as $code) {
-            foreach ($code['coding'] ?? [] as $coding) {
+        foreach (self::items($role['code'] ?? null) as $code) {
+            foreach (self::items(self::at($code, 'coding')) as $coding) {
+                $coding = self::items($coding);
                 $system = $this->system(self::string($coding['system'] ?? null) ?? '');
                 if (self::MODE === $system) {
-                    $code = self::string($coding['code'] ?? null);
-                    $mode = self::MODES[$code ?? ''] ?? $code;
+                    $modeCode = self::string($coding['code'] ?? null);
+                    $mode = self::MODES[$modeCode ?? ''] ?? $modeCode;
                 } elseif (self::ROLE === $system) {
                     $function = self::string($coding['display'] ?? $coding['code'] ?? null);
                 }
             }
         }
         [$phones, , $secure] = $this->telecom([...self::object($organization['telecom'] ?? null), ...self::object($role['telecom'] ?? null)]);
+        $address = self::at($organization, 'address', 0);
 
         return new Workplace(
             name: self::string($organization['name'] ?? null),
-            address: isset($organization['address'][0]) ? $this->address(self::object($organization['address'][0])) : null,
+            address: null !== $address ? $this->address(self::object($address)) : null,
             facility: null !== $organization ? $this->finess($organization) ?? self::string($organization['id'] ?? null) : null,
             mode: $mode,
             role: $function,
             phones: $phones,
             secureEmails: $secure,
-            active: (bool) ($role['active'] ?? true) && null === ($role['period']['end'] ?? null),
+            active: (bool) ($role['active'] ?? true) && null === self::at($role, 'period', 'end'),
         );
     }
 
+    /** @param array<mixed> $organization */
     private function facilityOf(array $organization): Facility
     {
         $kind = null;
         $identifiers = [];
-        foreach ($organization['identifier'] ?? [] as $identifier) {
-            $type = $identifier['type']['coding'][0]['code'] ?? null;
+        foreach (self::items($organization['identifier'] ?? null) as $identifier) {
+            $type = self::at($identifier, 'type', 'coding', 0, 'code');
             if ('FINEG' === $type) {
                 $kind = 'site';
             } elseif ('FINEJ' === $type) {
                 $kind = 'legal';
             }
-            if (isset($identifier['value'])) {
-                $identifiers[] = (string) $identifier['value'];
+            $value = self::at($identifier, 'value');
+            if (null !== $value) {
+                $identifiers[] = self::cast($value);
             }
         }
         $types = [];
-        foreach ($organization['type'] ?? [] as $type) {
-            foreach ($type['coding'] ?? [] as $coding) {
+        foreach (self::items($organization['type'] ?? null) as $type) {
+            foreach (self::items(self::at($type, 'coding')) as $coding) {
+                $coding = self::items($coding);
                 if (isset($coding['code']) && 'https://hl7.fr/ig/fhir/core/CodeSystem/fr-core-cs-v2-3307' !== ($coding['system'] ?? null)) {
                     $types[] = $this->qualification($coding);
                 }
             }
         }
         [$phones, $emails, $secure] = $this->telecom(self::object($organization['telecom'] ?? null));
+        $address = self::at($organization, 'address', 0);
 
         return new Facility(
-            identifier: $this->finess($organization) ?? (string) ($organization['id'] ?? ''),
-            name: (string) ($organization['name'] ?? ''),
+            identifier: $this->finess($organization) ?? self::cast($organization['id'] ?? ''),
+            name: self::cast($organization['name'] ?? ''),
             source: $this->name(),
             kind: $kind,
             types: $types,
-            address: isset($organization['address'][0]) ? $this->address(self::object($organization['address'][0])) : null,
+            address: null !== $address ? $this->address(self::object($address)) : null,
             phones: $phones,
             emails: $emails,
             secureEmails: $secure,
             identifiers: $identifiers,
             active: (bool) ($organization['active'] ?? true),
-            updatedAt: $this->date(self::string($organization['meta']['lastUpdated'] ?? null)),
+            updatedAt: $this->date(self::string(self::at($organization, 'meta', 'lastUpdated'))),
             raw: $organization,
         );
     }
 
+    /** @param array<mixed> $organization */
     private function finess(array $organization): ?string
     {
-        foreach ($organization['identifier'] ?? [] as $identifier) {
-            if ('https://finess.esante.gouv.fr' === ($identifier['system'] ?? null) || \in_array($identifier['type']['coding'][0]['code'] ?? null, ['FINEG', 'FINEJ'], true)) {
-                return Finess::normalize(self::string($identifier['value'] ?? null));
+        foreach (self::items($organization['identifier'] ?? null) as $identifier) {
+            if ('https://finess.esante.gouv.fr' === self::at($identifier, 'system') || \in_array(self::at($identifier, 'type', 'coding', 0, 'code'), ['FINEG', 'FINEJ'], true)) {
+                return Finess::normalize(self::string(self::at($identifier, 'value')));
             }
         }
 
         return null;
     }
 
-    /** @return array{family: string, given: ?string, prefix: ?string} */
+    /**
+     * @param array<mixed> $names
+     *
+     * @return array{family: string, given: ?string, prefix: ?string}
+     */
     private function usualName(array $names): array
     {
         $chosen = $names[0] ?? [];
         foreach ($names as $name) {
-            if ('usual' === ($name['use'] ?? null)) {
+            if ('usual' === self::at($name, 'use')) {
                 $chosen = $name;
                 break;
             }
         }
+        $given = self::at($chosen, 'given');
 
         return [
-            'family' => (string) ($chosen['family'] ?? ''),
-            'given' => isset($chosen['given']) ? implode(' ', self::object($chosen['given'])) : null,
-            'prefix' => self::string($chosen['prefix'][0] ?? null),
+            'family' => self::cast(self::at($chosen, 'family') ?? ''),
+            'given' => null !== $given ? implode(' ', array_map(self::cast(...), self::object($given))) : null,
+            'prefix' => self::string(self::at($chosen, 'prefix', 0)),
         ];
     }
 
-    /** @return array{list<string>, list<string>, list<string>} phones, e-mails, secure (MSSanté) e-mails */
+    /**
+     * @param array<mixed> $telecom
+     *
+     * @return array{list<string>, list<string>, list<string>} phones, e-mails, secure (MSSanté) e-mails
+     */
     private function telecom(array $telecom): array
     {
         $phones = $emails = $secure = [];
         foreach ($telecom as $point) {
-            $value = trim((string) ($point['value'] ?? ''));
+            $value = trim(self::cast(self::at($point, 'value') ?? ''));
             if ('' === $value) {
                 continue;
             }
-            if ('phone' === ($point['system'] ?? null)) {
+            $system = self::at($point, 'system');
+            if ('phone' === $system) {
                 $phones[] = $value;
-            } elseif ('email' === ($point['system'] ?? null)) {
+            } elseif ('email' === $system) {
                 $isSecure = str_ends_with(strtolower($value), '.mssante.fr');
-                foreach ($point['extension'] ?? [] as $extension) {
-                    if (self::MSSANTE === ($extension['valueCoding']['code'] ?? null)) {
+                foreach (self::items(self::at($point, 'extension')) as $extension) {
+                    if (self::MSSANTE === self::at($extension, 'valueCoding', 'code')) {
                         $isSecure = true;
                     }
                 }
@@ -413,23 +442,26 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
         return [array_values(array_unique($phones)), array_values(array_unique($emails)), array_values(array_unique($secure))];
     }
 
+    /** @param array<mixed> $address */
     private function address(array $address): Address
     {
         $street = null;
-        if (!empty($address['line'][0]) && empty($address['_line'][0]['extension'])) {
-            $street = (string) $address['line'][0];
+        $line = self::at($address, 'line', 0);
+        if (!empty($line) && empty(self::at($address, '_line', 0, 'extension'))) {
+            $street = self::cast($line);
         } else {
             $parts = [];
-            foreach ($address['_line'][0]['extension'] ?? [] as $extension) {
-                $key = substr((string) ($extension['url'] ?? ''), strrpos((string) ($extension['url'] ?? ''), '-') + 1);
+            foreach (self::items(self::at($address, '_line', 0, 'extension')) as $extension) {
+                $url = self::cast(self::at($extension, 'url') ?? '');
+                $key = substr($url, (int) strrpos($url, '-') + 1);
                 if (\in_array($key, ['houseNumber', 'buildingNumberSuffix', 'streetNameType', 'streetNameBase'], true)) {
-                    $parts[] = $extension['valueString'] ?? null;
+                    $parts[] = self::cast(self::at($extension, 'valueString'));
                 }
             }
-            $street = trim(implode(' ', array_filter($parts))) ?: (isset($address['line'][0]) ? (string) $address['line'][0] : null);
+            $street = trim(implode(' ', array_filter($parts))) ?: (null !== $line ? self::cast($line) : null);
         }
         $postalCode = self::string($address['postalCode'] ?? null);
-        $city = isset($address['city']) ? trim((string) preg_replace('/^\d{5}\s+/', '', (string) $address['city'])) : null;
+        $city = isset($address['city']) ? trim((string) preg_replace('/^\d{5}\s+/', '', self::cast($address['city']))) : null;
 
         return new Address(
             street: $street ?: null,
@@ -440,16 +472,18 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
         );
     }
 
+    /** @param array<mixed> $coding */
     private function profession(array $coding): Qualification
     {
-        $code = (string) ($coding['code'] ?? '');
+        $code = self::cast($coding['code'] ?? '');
 
         return new Qualification($code, self::PROFESSION, self::string($coding['display'] ?? null) ?? self::PROFESSIONS[$code] ?? null);
     }
 
+    /** @param array<mixed> $coding */
     private function qualification(array $coding): Qualification
     {
-        return new Qualification((string) $coding['code'], $this->system(self::string($coding['system'] ?? null) ?? ''), self::string($coding['display'] ?? null));
+        return new Qualification(self::cast($coding['code'] ?? null), $this->system(self::string($coding['system'] ?? null) ?? ''), self::string($coding['display'] ?? null));
     }
 
     /** ".../NOS/TRE_G15-ProfessionSante/FHIR/TRE-G15-ProfessionSante" -> "TRE_G15-ProfessionSante" */
@@ -482,7 +516,11 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
         return false;
     }
 
-    /** @return iterable<array> the resources of that type in a search Bundle */
+    /**
+     * @param array<mixed> $bundle
+     *
+     * @return iterable<array<mixed>> the resources of that type in a search Bundle
+     */
     private function resources(array $bundle, string $type): iterable
     {
         if (($bundle['resourceType'] ?? null) === $type) {
@@ -490,9 +528,10 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
 
             return;
         }
-        foreach ($bundle['entry'] ?? [] as $entry) {
-            if (($entry['resource']['resourceType'] ?? null) === $type) {
-                yield $entry['resource'];
+        foreach (self::items($bundle['entry'] ?? null) as $entry) {
+            $resource = self::at($entry, 'resource');
+            if (\is_array($resource) && ($resource['resourceType'] ?? null) === $type) {
+                yield $resource;
             }
         }
     }
@@ -506,6 +545,11 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
         }
     }
 
+    /**
+     * @param array<string, scalar> $query
+     *
+     * @return array<mixed>
+     */
     private function get(string $resource, array $query): array
     {
         if (null === $this->apiKey || '' === trim($this->apiKey)) {
@@ -537,7 +581,7 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
             return $response->toArray();
         } catch (ExceptionInterface $e) {
             // The key, in the request's headers, kept out: the previous a copy of the client's exception, no trace keeping the options.
-            $secrets = array_values(array_filter([(string) $this->apiKey]));
+            $secrets = array_filter([(string) $this->apiKey]);
 
             throw Redaction::withoutArguments(new UnavailableException('Annuaire Santé did not answer: '.Redaction::text($e->getMessage(), $secrets), null, Redaction::copy($e, $secrets)));
         }
@@ -575,6 +619,42 @@ final class AnnuaireSante implements ProfessionalRegistryInterface, FacilityRegi
             \is_array($value) => $value,
             default => throw self::malformed(),
         };
+    }
+
+    /**
+     * $value[$key][...] ?? null, as PHP reads it: an array's item, a string's
+     * character at an integer offset, null for anything else.
+     */
+    private static function at(mixed $value, string|int ...$keys): mixed
+    {
+        foreach ($keys as $key) {
+            if (\is_array($value)) {
+                $value = $value[$key] ?? null;
+            } elseif (\is_string($value) && \is_int($key)) {
+                $value = $value[$key] ?? null;
+            } else {
+                return null;
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * What a foreach over the answer's value goes through: the array, nothing
+     * for anything else (PHP warned and went through nothing).
+     *
+     * @return array<mixed>
+     */
+    private static function items(mixed $value): array
+    {
+        return \is_array($value) ? $value : [];
+    }
+
+    /** (string) of a scalar, as the answer's values were cast: "" for null, and for an array where PHP gave "Array". */
+    private static function cast(mixed $value): string
+    {
+        return \is_scalar($value) ? (string) $value : '';
     }
 
     /** The family's rule on a body that is not what it should be (docs/providers.md). */

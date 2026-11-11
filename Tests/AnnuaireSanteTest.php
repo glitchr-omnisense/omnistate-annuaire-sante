@@ -20,11 +20,12 @@ final class AnnuaireSanteTest extends TestCase
     {
         $requests = [];
         $professional = $this->registry('practitioner-physician.json', $requests)->professional('100 0346 1033');
+        self::assertNotNull($professional);
 
         self::assertSame('10003461033', $professional->identifier);
         self::assertSame('Arthur Saucier', $professional->name());
         self::assertSame('M', $professional->prefix);
-        self::assertSame('10', $professional->profession->code);
+        self::assertSame('10', $professional->profession?->code);
         self::assertSame('Médecin', (string) $professional->profession);
         self::assertSame('DE05', $professional->diplomas[0]->code);
         self::assertSame(['fr'], $professional->languages);
@@ -39,17 +40,19 @@ final class AnnuaireSanteTest extends TestCase
         self::assertStringStartsWith('https://gateway.api.esante.gouv.fr/fhir/v2/Practitioner?', $url);
         self::assertStringContainsString('identifier=10003461033', $url);
         self::assertStringContainsString('_revinclude=PractitionerRole:practitioner', $url);
+        self::assertIsArray($options['headers']);
         self::assertContains('ESANTE-API-KEY: test-key', $options['headers']);
     }
 
     public function testTheIdnpsFormIsTheSameProfessional(): void
     {
-        self::assertSame('10003461033', $this->registry('practitioner-physician.json')->professional('810003461033')->identifier);
+        self::assertSame('10003461033', $this->registry('practitioner-physician.json')->professional('810003461033')?->identifier);
     }
 
     public function testAPharmacistsMssanteAddressIsTold(): void
     {
         $professional = $this->registry('practitioner-pharmacist.json')->professional('10102727017');
+        self::assertNotNull($professional);
 
         self::assertSame('David CHATELIER', $professional->name());
         self::assertSame(['david.chatelier@exemple.mssante.fr'], $professional->secureEmails, 'his own MSSanté box');
@@ -73,7 +76,7 @@ final class AnnuaireSanteTest extends TestCase
         $inClamart = $registry->search('a', '92');
         self::assertCount(1, $inClamart);
         self::assertSame('Arthur Saucier', $inClamart[0]->name());
-        self::assertSame('CLAMART', $inClamart[0]->workplaces[0]->address->city);
+        self::assertSame('CLAMART', $inClamart[0]->workplaces[0]->address?->city);
         self::assertSame('92140', $inClamart[0]->workplaces[0]->address->postalCode);
         self::assertSame([], $registry->search('  '));
     }
@@ -81,11 +84,12 @@ final class AnnuaireSanteTest extends TestCase
     public function testAFacilityByFiness(): void
     {
         $facility = $this->registry('organization.json')->facility('754 567 860');
+        self::assertNotNull($facility);
 
         self::assertSame('754567860', $facility->identifier);
         self::assertSame('CH EURE-SEINE', $facility->name);
         self::assertSame('site', $facility->kind, 'a FINESS géographique');
-        self::assertSame('96 R DIDOT', $facility->address->street);
+        self::assertSame('96 R DIDOT', $facility->address?->street);
         self::assertSame('PARIS', $facility->address->city);
         self::assertSame(['0450636363'], $facility->phones);
         self::assertSame(['SA01', '86.10Z'], array_map(static fn ($type) => $type->code, $facility->types));
@@ -138,22 +142,21 @@ final class AnnuaireSanteTest extends TestCase
     {
         $omnistate = new Omnistate(professionals: [$this->registry('practitioner-physician.json')]);
 
-        self::assertSame('Médecin', (string) $omnistate->professional('10003461033')->profession);
+        self::assertSame('Médecin', (string) $omnistate->professional('10003461033')?->profession);
         self::assertTrue($this->registry('organization.json')->supportsFacility('2A0001234'), 'Corsica');
     }
 
     /** A resource whose fields are not of FHIR's shapes is the register's fault: unavailable, as the family's rule has it. */
     public function testAResourceOfAnotherShapeIsUnavailable(): void
     {
-        $physician = json_decode((string) file_get_contents(__DIR__.'/Fixtures/practitioner-physician.json'), true);
-        self::assertIsArray($physician);
+        $rpps = ['system' => 'https://rpps.esante.gouv.fr', 'value' => '10003461033'];
         $shapes = [
-            'a name that is not a list' => static function (array $bundle): array { $bundle['entry'][0]['resource']['name'] = 'Saucier'; return $bundle; },
-            'a telecom that is not a list' => static function (array $bundle): array { $bundle['entry'][0]['resource']['telecom'] = '0603590791'; return $bundle; },
-            'an identifier value that is an object' => static function (array $bundle): array { $bundle['entry'][0]['resource']['identifier'][0]['value'] = ['10003461033']; return $bundle; },
+            'a name that is not a list' => ['resourceType' => 'Practitioner', 'identifier' => [$rpps], 'name' => 'Saucier'],
+            'a telecom that is not a list' => ['resourceType' => 'Practitioner', 'identifier' => [$rpps], 'telecom' => '0603590791'],
+            'an identifier value that is an object' => ['resourceType' => 'Practitioner', 'identifier' => [['value' => ['10003461033']] + $rpps]],
         ];
-        foreach ($shapes as $shape => $change) {
-            $registry = new AnnuaireSante(new MockHttpClient(new MockResponse(json_encode($change($physician), \JSON_THROW_ON_ERROR))), 'test-key');
+        foreach ($shapes as $shape => $practitioner) {
+            $registry = new AnnuaireSante(new MockHttpClient(new MockResponse(json_encode($practitioner, \JSON_THROW_ON_ERROR))), 'test-key');
             try {
                 $registry->professional('10003461033');
                 self::fail($shape.': answered');
@@ -163,13 +166,18 @@ final class AnnuaireSanteTest extends TestCase
         }
     }
 
+    /**
+     * @param list<array{string, string, array<mixed>}>|null $requests
+     *
+     * @param-out list<array{string, string, array<mixed>}> $requests
+     */
     private function registry(string $fixture, ?array &$requests = null): AnnuaireSante
     {
         $requests = [];
         $client = new MockHttpClient(function (string $method, string $url, array $options) use ($fixture, &$requests) {
             $requests[] = [$method, $url, $options];
 
-            return new MockResponse(file_get_contents(__DIR__.'/Fixtures/'.$fixture), ['response_headers' => ['Content-Type: application/fhir+json']]);
+            return new MockResponse((string) file_get_contents(__DIR__.'/Fixtures/'.$fixture), ['response_headers' => ['Content-Type: application/fhir+json']]);
         });
 
         return new AnnuaireSante($client, 'test-key');
