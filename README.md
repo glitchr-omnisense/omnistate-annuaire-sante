@@ -23,6 +23,14 @@ subscription to "API Annuaire Santé en libre accès"; it goes in the `ESANTE-AP
 second. There is no sandbox: the API answers the real register. Without a key, every call throws
 `UnavailableException`.
 
+## Install
+
+```sh
+composer require omnistate/annuaire-sante
+```
+
+It brings the family's core, `omnisense/omnistate`, and `omnisense/contracts` with it. **A key is needed** for any call, free: the ANS's Gravitee portal (above). Without one every call throws `UnavailableException`; the tests run on recorded answers.
+
 ## Responsibility
 
 This package is an independent, unofficial client: it is not affiliated with, endorsed by or
