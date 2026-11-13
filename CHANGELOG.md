@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-14
+
+### Changed
+
+- Neutral example data in docs and tests.
+
 ## [1.0.0] - 2026-11-13
 
 ### Added

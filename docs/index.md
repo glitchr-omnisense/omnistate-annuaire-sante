@@ -111,7 +111,7 @@ practitioner with the roles that reference it and the organizations they referen
 ## Example
 
 Without a key at hand, this script runs the register on the ANS's answers recorded in
-`Tests/Fixtures` (fictional people of the ANS's implementation guide), served by a
+`Tests/Fixtures` (the shape of the ANS's implementation guide's examples, with invented people), served by a
 `MockHttpClient`; with a key, replace the client by `HttpClient::create()`.
 
 ```php
@@ -134,7 +134,7 @@ $http = new MockHttpClient(static fn (string $method, string $url) => new MockRe
 
 $omnistate = new Omnistate(professionals: [new AnnuaireSante($http, 'a-key')]);
 
-$professional = $omnistate->professional('810003461033');   // the IDNPS form: the same RPPS
+$professional = $omnistate->professional('810000000017');   // the IDNPS form: the same RPPS
 printf("%s %s (%s), %s [%s %s]\n", $professional->prefix, $professional->name(), $professional->identifier, $professional->profession, $professional->profession?->system, $professional->profession?->code);
 foreach ($professional->diplomas as $diploma) {
     printf("  diploma %s (%s)\n", $diploma, $diploma->code);
@@ -153,18 +153,18 @@ foreach ($omnistate->professionals('a', limit: 5) as $found) {
 ```
 
 ```
-M Arthur Saucier (10003461033), Médecin [TRE_G15-ProfessionSante 10]
+M Jean Exemple (10000000017), Médecin [TRE_G15-ProfessionSante 10]
   diploma DE05 (DE05)
-  works at CABINET SAINT ANTOINE, FINESS 548812, liberal, FON-AU, active
+  works at CABINET EXEMPLE, FINESS 548812, liberal, FON-AU, active
 
 CH EURE-SEINE (754567860, site), 96 R DIDOT 75014 PARIS
 
 Search "a":
-  10003461033 Arthur Saucier         Médecin
-  10102727017 David CHATELIER        Pharmacien
+  10000000017 Jean Exemple           Médecin
+  10000000025 Paul EXEMPLE           Pharmacien
 ```
 
-(run on 2026-10-25 in omnistate's Docker harness, on the recorded answers, not against the ANS)
+(run on 2026-11-14 in omnistate's Docker harness, on the recorded answers, not against the ANS)
 
 With the key, in plain PHP: `new AnnuaireSante(HttpClient::create(), getenv('ESANTE_API_KEY'))`.
 
@@ -189,7 +189,7 @@ pharmacist's MSSanté address, another practitioner's answer not taken for their
 narrowed to a postcode, a facility by FINESS, nothing asked without a key, a 429 with its
 `Retry-After` in seconds and as a date, through the facade) and `Tests/AnnuaireSanteContractTest.php`, omnistate's
 conformance suite (professionals and facilities). The tests run on the examples of the ANS's
-implementation guide (fictional people) put in search bundles.
+implementation guide put in search bundles, the practitioners' identities invented.
 
 Not verified: the request shape (the `_revinclude` / `_include:iterate` pair) follows the guide;
 it has not been tried against the real API, no key being at hand.

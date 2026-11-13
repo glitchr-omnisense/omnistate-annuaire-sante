@@ -7,7 +7,7 @@ how, their MSSanté addresses - and a facility by FINESS number. For [omnisense/
 
 ```php
 $registry = new AnnuaireSante($httpClient, $_ENV['ESANTE_API_KEY']);
-$professional = $registry->professional('10003461033');      // or its IDNPS, 810003461033
+$professional = $registry->professional('10000000017');      // or its IDNPS, 810000000017
 $professional->name(), $professional->profession /* Médecin */, $professional->specialties,
 $professional->workplaces /* name, address, FINESS, liberal|salaried */, $professional->secureEmails;
 $registry->search('Martin', postcode: '67');

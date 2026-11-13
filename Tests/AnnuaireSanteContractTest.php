@@ -27,6 +27,12 @@ final class AnnuaireSanteContractTest extends TestCase
         }), ['response_headers' => ['content-type' => 'application/json']])];
     }
 
+    /** The invented physician of Tests/Fixtures. */
+    protected function professionalIdentifier(): string
+    {
+        return '10000000017';
+    }
+
     protected function searchQuery(): string
     {
         return 'a';
